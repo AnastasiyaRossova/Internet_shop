@@ -22,6 +22,15 @@ class Category:
         """Геттер, который выводит список товаров в формате: продукт, цена, остаток- шт."""
         return [f'{self.name}, {self.price} руб. Остаток: {self.quantity} шт.' for good in self.__goods]
 
+    def __str__(self):
+        "Строка, отображения 'Наименование продукта, кол-во пна складе: ** шт.'"
+        return f'{self.name}, количество продуктов на складе: {self.__len__()} шт.'
+
+    def __len__(self):
+        "подсчет кол-ва продуктов в категории"
+        total_goods = len(self.__goods)
+        return total_goods
+
 class Product:
     name: str
     description: str
@@ -33,6 +42,12 @@ class Product:
         self.description = description
         self.quantity = quantity
         self.price = price
+
+    def __str__(self):
+        return f'{self.name}, {self.price} руб. Остаток: {self.__len__()} шт.'
+
+    def __len__(self):
+        return self.quantity
 
     @classmethod
     def create(cls, name, description, quantity, price, goods):
@@ -47,7 +62,7 @@ class Product:
                 good.quantity += quantity
                 good.price = max(good.price, price)
                 return good
-        return cls(name, price, quantity)  #как в этом методе сравнить еще и описание товара? Например в списке есть туфли, и добавляют еще туфли- но они могут быть на разном каблуке.
+        return cls(name, price, quantity)  #?? как в этом методе сравнить еще и описание товара? Например в списке есть туфли, и добавляют еще туфли- но они могут быть на разном каблуке.
 
     @property
     def price(self):
@@ -72,6 +87,38 @@ class Product:
                 print("Отмена действия")
         else:
             self.price = new_price
+
+    def __add__(self, other):
+        """добавляем возможность получения общей суммы товара на складе, таким образом,
+        чтобы результат выполнения сложения двух продуктов
+         был сложением сумм, умноженных на количество этих продуктов на складе.
+        ((кол-во товара 1 * цену товара 1) + (кол-во товара 2 * цену товара 2))"""
+        return self.price * self.quantity + other.price * other.quantity
+
+class CategoryIterator:
+    def __init__(self, name):
+        self.name = name
+        self.products = []
+
+    def add_product(self, product):
+        self.products.append(product)
+
+    def __iter__(self):
+        self.current_value = -1
+        return self
+
+    def __next__(self):
+        self.current_value += 1
+        if self.current_value < len(self.product):
+            return self.products[self.current_value]
+        else:
+            raise StopIteration
+
+# category_iterator = CategoryIterator([products])
+# Перебор товаров с помощью цикла for
+# for product in category_iterator:
+    #print(product)
+
 
 
 
