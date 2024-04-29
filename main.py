@@ -50,6 +50,17 @@ class Category(Repr_Mixin):
         total_goods = len(self.__goods)
         return total_goods
 
+    def calculate_avg_price(self):
+        try:
+            total_price = 0
+            total_quantity = 0
+            for product in self.__goods:
+                total_price += product.price * product._quantity
+                total_quantity += product._quantity
+            return total_price / total_quantity
+        except ZeroDivisionError:
+            return 0
+
 
 class Product(Repr_Mixin, Abstract_Product):
     name: str
@@ -78,6 +89,8 @@ class Product(Repr_Mixin, Abstract_Product):
         необходимо сложить количество в наличии старого товара и нового.
         При конфликте цен выбрать ту, которая является более высокой.
         Для этого можно в метод передать список товаров, в котором нужно искать дубликаты."""
+        if quantity <= 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
         for good in goods:
             if good.name.lower() == name.lower():
                 good.quantity += quantity
@@ -118,6 +131,7 @@ class Product(Repr_Mixin, Abstract_Product):
             raise TypeError("Классы должны совпадать")
         return (self._price * self._quantity
                 + other._price * other._quantity)
+
 
 class CategoryIterator:
     def __init__(self, name):
