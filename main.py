@@ -7,24 +7,26 @@ class Category:
     goods: list
 
     def __init__(self, name, description, goods):
-        self.name = name
-        self.description = description
+        self._name = name
+        self._description = description
         self.__goods = goods
-        self.all_total_category = 1
+        self._all_total_category = 1
         Category.all_total_unique_product += 1
 
     def add_goods(self, good):
         """принимает товар и добавляет этот товар в приватный список"""
+        if not isinstance(type(good), Product) and not issubclass(type(good), Product):
+            raise ValueError
         self.__goods.append(good)
 
     @property
     def goods(self):
         """Геттер, который выводит список товаров в формате: продукт, цена, остаток- шт."""
-        return [f'{self.name}, {self.price} руб. Остаток: {self.quantity} шт.' for good in self.__goods]
+        return self.__goods
 
     def __str__(self):
         "Строка, отображения 'Наименование продукта, кол-во пна складе: ** шт.'"
-        return f'{self.name}, количество продуктов на складе: {self.__len__()} шт.'
+        return f'{self._name}, количество продуктов на складе: {self.__len__()} шт.'
 
     def __len__(self):
         "подсчет кол-ва продуктов в категории"
@@ -38,16 +40,16 @@ class Product:
     price: float
 
     def __init__(self, name, description, quantity, price):
-        self.name = name
-        self.description = description
-        self.quantity = quantity
-        self.price = price
+        self._name = name
+        self._description = description
+        self._quantity = quantity
+        self._price = price
 
     def __str__(self):
-        return f'{self.name}, {self.price} руб. Остаток: {self.__len__()} шт.'
+        return f'{self._name}, {self._price} руб. Остаток: {self.__len__()} шт.'
 
     def __len__(self):
-        return self.quantity
+        return self._quantity
 
     @classmethod
     def create(cls, name, description, quantity, price, goods):
@@ -68,7 +70,7 @@ class Product:
     def price(self):
         """Для класса Product геттеры для атрибута цены.
         """
-        return self.price
+        return self._price
 
     @price.setter
     def price(self, new_price) -> float:
@@ -79,21 +81,24 @@ class Product:
             y (значит yes) или n (значит no) для согласия понизить цену или для отмены действия соответственно."""
         if new_price <= 0:
             print("Цена введена некорректная")
-        elif self.price < new_price:
+        elif self._price < new_price:
             confirmation = input("Хотите зафиксировать пониженную цену? (y/n)")
             if confirmation == "y":
-                self.price = new_price
+                self._price = new_price
             else:
                 print("Отмена действия")
         else:
-            self.price = new_price
+            self._price = new_price
 
     def __add__(self, other):
         """добавляем возможность получения общей суммы товара на складе, таким образом,
         чтобы результат выполнения сложения двух продуктов
          был сложением сумм, умноженных на количество этих продуктов на складе.
         ((кол-во товара 1 * цену товара 1) + (кол-во товара 2 * цену товара 2))"""
-        return self.price * self.quantity + other.price * other.quantity
+        if type(self) != type(other):
+            raise TypeError("Классы должны совпадать")
+        return (self._price * self._quantity
+                + other._price * other._quantity)
 
 class CategoryIterator:
     def __init__(self, name):
@@ -113,6 +118,67 @@ class CategoryIterator:
             return self.products[self.current_value]
         else:
             raise StopIteration
+
+
+class Smartphone(Product):
+    def __init__(self, name, description, quantity,
+                 price, perf, model, memory, color):
+        super().__init__(name, description, quantity, price)
+        self._performance = perf
+        self._model = model
+        self._memory = memory
+        self._color = color
+
+    def __str__(self):
+        super().__str__()
+
+    def __len__(self):
+        super().__len__()
+
+    @classmethod
+    def create(cls, name, description, quantity, price, goods):
+        super().create(name, description, quantity, price, goods)
+
+    @property
+    def price(self):
+        self._price
+
+    @price.setter
+    def price(self, new_price):
+        super().price(new_price)
+
+    def __add__(self, other):
+        super().__add__(other)
+
+
+class Grass(Product):
+    def __init__(self, name, description, quantity, price, country, period, color):
+        super().__init__(name, description, quantity, price)
+        self.country = country
+        self.period = period
+        self.color = color
+
+    def __str__(self):
+        super().__str__()
+
+    def __len__(self):
+        super().__len__()
+
+    @classmethod
+    def create(cls, name, description, quantity, price, goods):
+        super().create(name, description, quantity, price, goods)
+
+    @property
+    def price(self):
+        super().price()
+
+    @price.setter
+    def price(self, new_price):
+        super().price(new_price)
+
+    def __add__(self, other):
+        super().__add__(other)
+
 
 # category_iterator = CategoryIterator([products])
 # Перебор товаров с помощью цикла for
