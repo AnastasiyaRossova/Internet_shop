@@ -1,5 +1,21 @@
+from abc import ABC, abstractmethod
 
-class Category:
+
+class Abstract_Product(ABC):
+    @abstractmethod
+    def create(self):
+        pass
+
+    @abstractmethod
+    def price(self):
+        pass
+
+class Repr_Mixin:
+    def __repr__(self):
+        return f"Создан объект под именем {self._name}: {self._description}"
+
+
+class Category(Repr_Mixin):
     all_total_category = 0
     all_total_unique_product = 0
     name: str
@@ -12,6 +28,7 @@ class Category:
         self.__goods = goods
         self._all_total_category = 1
         Category.all_total_unique_product += 1
+        print(repr(self))
 
     def add_goods(self, good):
         """принимает товар и добавляет этот товар в приватный список"""
@@ -33,7 +50,8 @@ class Category:
         total_goods = len(self.__goods)
         return total_goods
 
-class Product:
+
+class Product(Repr_Mixin, Abstract_Product):
     name: str
     description: str
     quantity: int
@@ -44,6 +62,7 @@ class Product:
         self._description = description
         self._quantity = quantity
         self._price = price
+        print(repr(self))
 
     def __str__(self):
         return f'{self._name}, {self._price} руб. Остаток: {self.__len__()} шт.'
@@ -184,8 +203,3 @@ class Grass(Product):
 # Перебор товаров с помощью цикла for
 # for product in category_iterator:
     #print(product)
-
-
-
-
-
