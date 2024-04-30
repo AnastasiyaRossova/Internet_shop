@@ -34,6 +34,8 @@ class Category(Repr_Mixin):
         """принимает товар и добавляет этот товар в приватный список"""
         if not isinstance(type(good), Product) and not issubclass(type(good), Product):
             raise ValueError
+        if good._quantity <= 0:
+            raise ValueError("Нельзя добавить товар с нулевым количеством!")
         self.__goods.append(good)
 
     @property
